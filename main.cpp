@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cassert>
-#include "DeleteChange.h"
+#include "TextEditor.h"
 
 int main() {
     cout << "---Tests for the first lab---" << endl;
@@ -26,7 +26,7 @@ int main() {
     cout << "The copy constructor test has been passed." << endl;
 
     //Метод идентификации
-    assert(defaultAddFragment.isDeleteChange() == false);
+    assert(defaultAddFragment.identify() == "AddFragment");
 
     //Геттеры, сеттеры
     defaultAddFragment.setBaseText("Hello. Hello. Hello...");
@@ -72,7 +72,7 @@ int main() {
     cout << "The copy constructor test has been passed." << endl;
 
     //Метод идентификации
-    assert(defaultDeleteChange.isDeleteChange() == true);
+    assert(defaultDeleteChange.identify() == "DeleteChange");
 
     //Геттеры, сеттеры
     defaultDeleteChange.setBaseText("Hello. Hello. Hello...");
@@ -108,6 +108,100 @@ int main() {
     cout << "The eighth test is passed." << endl;
     assert(defaultDeleteChange.pasteFragment("Hello, Hello", "Hey, hey. ", 11) == "Hello, HellHey, hey. o");
     cout << "The ninth test is passed." << endl;
-    
+
+    //Проверки класса: хранение истории правок
+    cout << endl << "---Tests for the third lab---" << endl;
+
+    TextEditor defaultTextEditor;
+
+    DeleteChange exampleDeleteChange1;
+    exampleDeleteChange1.setBaseText("Hello. Hello. Hello...");
+    exampleDeleteChange1.setInputText("hi, hi");
+    exampleDeleteChange1.setPositionEditedSubstring(2);
+    exampleDeleteChange1.setSecondPosEditSubStr(8);
+
+    DeleteChange exampleDeleteChange2;
+    exampleDeleteChange1.setBaseText("I'm Dmitry");
+    exampleDeleteChange1.setInputText("Hello");
+    exampleDeleteChange1.setPositionEditedSubstring(0);
+    exampleDeleteChange1.setSecondPosEditSubStr(2);
+
+    DeleteChange exampleDeleteChange3;
+    exampleDeleteChange1.setBaseText("Bye. New;.");
+    exampleDeleteChange1.setInputText("Wow");
+    exampleDeleteChange1.setPositionEditedSubstring(4);
+    exampleDeleteChange1.setSecondPosEditSubStr(6);
+
+    assert(defaultTextEditor.isEmptyUndoStack() == true);
+    assert(defaultTextEditor.isEmptyRedoStack() == true);
+    cout << "Empty stack checks passed." << endl;
+
+    //Проверка метода add
+    defaultTextEditor.add(exampleDeleteChange1);
+    defaultTextEditor.add(exampleDeleteChange2);
+    defaultTextEditor.add(exampleDeleteChange3);
+    assert(defaultTextEditor.isEmptyUndoStack() == false);
+
+    assert(defaultTextEditor.getCountUndo() == 3);
+    assert(defaultTextEditor.getCountRedo() == 3);
+    cout << "The first test for the add method has been passed." << endl;
+
+    //Провека метода undo
+    defaultTextEditor.undo();
+
+    assert(defaultTextEditor.getTopUndo().getBaseText() == exampleDeleteChange2.getBaseText());
+    assert(defaultTextEditor.getTopUndo().getInputText() == exampleDeleteChange2.getInputText());
+    assert(defaultTextEditor.getTopUndo().getPositionEditedSubstring() == exampleDeleteChange2.getPositionEditedSubstring());
+    assert(defaultTextEditor.getTopUndo().getSecondPosEditSubStr() == exampleDeleteChange2.getSecondPosEditSubStr());
+
+    assert(defaultTextEditor.getTopRedo().getBaseText() == exampleDeleteChange3.getBaseText());
+    assert(defaultTextEditor.getTopRedo().getInputText() == exampleDeleteChange3.getInputText());
+    assert(defaultTextEditor.getTopRedo().getPositionEditedSubstring() == exampleDeleteChange3.getPositionEditedSubstring());
+    assert(defaultTextEditor.getTopRedo().getSecondPosEditSubStr() == exampleDeleteChange3.getSecondPosEditSubStr());
+
+    assert(defaultTextEditor.getCountUndo() == 2);
+    assert(defaultTextEditor.getCountRedo() == 3);
+
+    cout << "The second test for the undo method has been passed." << endl;
+
+    //Проверка метода add при разнице в размере стеках
+    defaultTextEditor.add(exampleDeleteChange1);
+    assert(defaultTextEditor.getTopUndo().getBaseText() == exampleDeleteChange1.getBaseText());
+    assert(defaultTextEditor.getTopUndo().getInputText() == exampleDeleteChange1.getInputText());
+    assert(defaultTextEditor.getTopUndo().getPositionEditedSubstring() == exampleDeleteChange1.getPositionEditedSubstring());
+    assert(defaultTextEditor.getTopUndo().getSecondPosEditSubStr() == exampleDeleteChange1.getSecondPosEditSubStr());
+
+    assert(defaultTextEditor.getTopRedo().getBaseText() == exampleDeleteChange1.getBaseText());
+    assert(defaultTextEditor.getTopRedo().getInputText() == exampleDeleteChange1.getInputText());
+    assert(defaultTextEditor.getTopRedo().getPositionEditedSubstring() == exampleDeleteChange1.getPositionEditedSubstring());
+    assert(defaultTextEditor.getTopRedo().getSecondPosEditSubStr() == exampleDeleteChange1.getSecondPosEditSubStr());
+
+    assert(defaultTextEditor.getCountUndo() == 3);
+    assert(defaultTextEditor.getCountRedo() == 3);
+
+    cout << "The second test for the add method has been passed." << endl;
+
+    //Проверка метода redo
+
+    defaultTextEditor.undo();
+    defaultTextEditor.undo();
+
+    defaultTextEditor.redo();
+
+    assert(defaultTextEditor.getTopUndo().getBaseText() == exampleDeleteChange2.getBaseText());
+    assert(defaultTextEditor.getTopUndo().getInputText() == exampleDeleteChange2.getInputText());
+    assert(defaultTextEditor.getTopUndo().getPositionEditedSubstring() == exampleDeleteChange2.getPositionEditedSubstring());
+    assert(defaultTextEditor.getTopUndo().getSecondPosEditSubStr() == exampleDeleteChange2.getSecondPosEditSubStr());
+
+    assert(defaultTextEditor.getTopRedo().getBaseText() == exampleDeleteChange2.getBaseText());
+    assert(defaultTextEditor.getTopRedo().getInputText() == exampleDeleteChange2.getInputText());
+    assert(defaultTextEditor.getTopRedo().getPositionEditedSubstring() == exampleDeleteChange2.getPositionEditedSubstring());
+    assert(defaultTextEditor.getTopRedo().getSecondPosEditSubStr() == exampleDeleteChange2.getSecondPosEditSubStr());
+
+    assert(defaultTextEditor.getCountUndo() == 2);
+    assert(defaultTextEditor.getCountRedo() == 2);
+
+    cout << "The test for the redo method has been passed." << endl;
+    cout << "Tests for 3 labs have been successfully passed." << endl;
     return 0;
 }

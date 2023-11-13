@@ -13,7 +13,7 @@ public:
     AddFragment(const AddFragment& fragment);
 
     //Ф-ия идентификатор
-    virtual bool isDeleteChange();
+    virtual string identify() const;
     //Геттеры, сеттеры
     string getBaseText() const;
     void setBaseText(string baseText);
@@ -30,8 +30,8 @@ protected:
     int m_positionEditedSubstring;
 };
 
-bool AddFragment::isDeleteChange() {
-    return false;
+string AddFragment::identify() const {
+    return "AddFragment";
 }
 
 AddFragment::AddFragment() {

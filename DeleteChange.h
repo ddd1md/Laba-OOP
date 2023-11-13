@@ -13,7 +13,7 @@ public:
 	DeleteChange(const DeleteChange& delChan);
 	
 	//Ф-ия идентификатор
-	bool isDeleteChange() override;
+	string identify() const override;
 	//Геттеры, сеттеры
 	int getSecondPosEditSubStr() const;
 	void setSecondPosEditSubStr(int secondPositionEditedSubstring);
@@ -30,8 +30,8 @@ private:
 	int m_secondPositionEditedSubstring;
 };
 
-bool DeleteChange::isDeleteChange() {
-	return true;
+string DeleteChange::identify() const {
+	return "DeleteChange";
 }
 
 DeleteChange::DeleteChange() : AddFragment() {
